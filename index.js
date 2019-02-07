@@ -7,7 +7,7 @@ const IORedis = require('ioredis');
  */
 class Redis extends IORedis {
   /**
-   * @param {object} config
+   * @param {object} config ioredis config
    */
   constructor(config) {
     super(config);
@@ -17,7 +17,7 @@ class Redis extends IORedis {
 
   /**
    * Wrapper for scanStream that returns a promise
-   * @param {*[]} args
+   * @param {*} args
    * @returns {Promise<*>}
    */
   async scanPromise(...args) {
@@ -38,8 +38,8 @@ class Redis extends IORedis {
 
   /**
    * Process the returned array from a transaction, throwing errors if any exist
-   * @param {*} results
-   * @returns {*}
+   * @param {object[]} results
+   * @returns {object[]}
    */
   static processMultiResults(results) {
     const ERR_INDEX = 0;

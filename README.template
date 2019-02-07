@@ -1,0 +1,6 @@
+# redis
+Redis wrapper
+
+Wrapper for ioredis: https://github.com/luin/ioredis
+
+{{>main}}
