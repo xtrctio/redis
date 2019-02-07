@@ -23,6 +23,9 @@
     "client",
     "redis"
   ],
+  "files": [
+    "index.js"
+  ],
   "license": "MIT",
   "main": "index.js",
   "peerDependencies": {
