@@ -18,8 +18,8 @@ jobs:
 
       # run tests!
       - run:
-          name: lint
-          command: npm run lint
+          name: test
+          command: npm run test
 workflows:
   version: 2
   test:
