@@ -1,4 +1,7 @@
 # redis
+
+[![CircleCI](https://circleci.com/gh/xtrctio/redis.svg?style=svg)](https://circleci.com/gh/xtrctio/redis)
+
 Redis wrapper
 
 Wrapper for ioredis: https://github.com/luin/ioredis
