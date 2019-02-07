@@ -2,7 +2,6 @@ jobs:
   test:
     docker:
       - image: node:latest
-      - image: redis:4
     working_directory: ~/repo
     steps:
       - checkout
