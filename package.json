@@ -1,0 +1,23 @@
+{
+  "name": "@xtrctio/redis",
+  "version": "0.0.1",
+  "description": "Redis wrapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xtrctio/redis.git"
+  },
+  "keywords": [
+    "redis",
+    "client"
+  ],
+  "author": "Eric Hacke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xtrctio/redis/issues"
+  },
+  "homepage": "https://github.com/xtrctio/redis#readme"
+}
