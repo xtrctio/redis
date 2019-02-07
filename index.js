@@ -45,7 +45,7 @@ class Redis extends IORedis {
     const ERR_INDEX = 0;
     const RESULT_INDEX = 1;
 
-    if (Array.isArray(results) || !results.every(Array.isArray)) {
+    if (!Array.isArray(results) || !results.every(Array.isArray)) {
       throw new Error('results must be an array of arrays');
     }
 
