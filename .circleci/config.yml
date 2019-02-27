@@ -22,7 +22,7 @@ jobs:
           name: test
           command: npm run test-most
           environment:
-            REDIS_HOST: redis
+            REDIS_HOST: localhost
             REDIS_PORT: 6379
 workflows:
   version: 2
