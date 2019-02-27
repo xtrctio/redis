@@ -18,12 +18,28 @@ class Redis extends IORedis {
   }
 
   /**
+   * Acquire lock in Redis
+   * @param {string} key
+   * @param {number} ttl
+   * @returns {Promise<Lock|null>}
+   */
+  async lock(key, ttl) {
+    return this.redlock.lock(key, ttl).catch((err) => {
+      if (err && err.message && err.message.includes('attempts to lock the resource')) {
+        return null;
+      }
+
+      throw err;
+    });
+  }
+
+  /**
    * Get redlock instance
    * @link https://www.npmjs.com/package/redlock
    * @param {object} [config={ retryCount: 5 }]
    * @returns {Redlock}
    */
-  createRedlock(config = { retryCount: 5 }) {
+  createRedlock(config = { retryCount: 0 }) {
     const self = this;
     return new Redlock([self], config);
   }

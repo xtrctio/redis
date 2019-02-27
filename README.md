@@ -14,6 +14,7 @@ Wrapper for ioredis: https://github.com/luin/ioredis
 * [Redis](#Redis)
     * [new Redis(config)](#new_Redis_new)
     * _instance_
+        * [.lock(key, ttl)](#Redis+lock) ⇒ <code>Promise.&lt;(Lock\|null)&gt;</code>
         * [.createRedlock([config])](#Redis+createRedlock) ⇒ <code>Redlock</code>
         * [.scanPromise(...args)](#Redis+scanPromise) ⇒ <code>Promise.&lt;\*&gt;</code>
     * _static_
@@ -26,6 +27,18 @@ Wrapper for ioredis: https://github.com/luin/ioredis
 | Param | Type | Description |
 | --- | --- | --- |
 | config | <code>object</code> | ioredis config |
+
+<a name="Redis+lock"></a>
+
+### redis.lock(key, ttl) ⇒ <code>Promise.&lt;(Lock\|null)&gt;</code>
+Acquire lock in Redis
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type |
+| --- | --- |
+| key | <code>string</code> | 
+| ttl | <code>number</code> | 
 
 <a name="Redis+createRedlock"></a>
 
