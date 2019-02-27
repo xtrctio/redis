@@ -14,6 +14,7 @@ Wrapper for ioredis: https://github.com/luin/ioredis
 * [Redis](#Redis)
     * [new Redis(config)](#new_Redis_new)
     * _instance_
+        * [.createRedlock([config])](#Redis+createRedlock) ⇒ <code>Redlock</code>
         * [.scanPromise(...args)](#Redis+scanPromise) ⇒ <code>Promise.&lt;\*&gt;</code>
     * _static_
         * [.processMultiResults(results)](#Redis.processMultiResults) ⇒ <code>Array.&lt;object&gt;</code>
@@ -25,6 +26,18 @@ Wrapper for ioredis: https://github.com/luin/ioredis
 | Param | Type | Description |
 | --- | --- | --- |
 | config | <code>object</code> | ioredis config |
+
+<a name="Redis+createRedlock"></a>
+
+### redis.createRedlock([config]) ⇒ <code>Redlock</code>
+Get redlock instance
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+**Link**: https://www.npmjs.com/package/redlock  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| [config] | <code>object</code> | <code>{ retryCount: 5 }</code> | 
 
 <a name="Redis+scanPromise"></a>
 

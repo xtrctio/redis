@@ -1,6 +1,7 @@
 'use strict';
 
 const IORedis = require('ioredis');
+const Redlock = require('redlock');
 
 /**
  * @class
@@ -13,6 +14,18 @@ class Redis extends IORedis {
     super(config);
 
     this.NAME = 'redis';
+    this.redlock = this.createRedlock();
+  }
+
+  /**
+   * Get redlock instance
+   * @link https://www.npmjs.com/package/redlock
+   * @param {object} [config={ retryCount: 5 }]
+   * @returns {Redlock}
+   */
+  createRedlock(config = { retryCount: 5 }) {
+    const self = this;
+    return new Redlock([self], config);
   }
 
   /**

@@ -41,5 +41,8 @@
     "docs": "jsdoc2md --template README.template --files \"index.js\" > README.md && git add README.md",
     "lint": "eslint \"**/*.js\" --fix",
     "test": "mocha \"tests/**.unit.js\" && npm run lint"
+  },
+  "dependencies": {
+    "redlock": "^3.1.2"
   }
 }
