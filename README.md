@@ -109,7 +109,7 @@ Process the returned array from a transaction, throwing errors if any exist
 
 * [Cached](#Cached)
     * [new Cached(redis, prefix, ttlSec)](#new_Cached_new)
-    * [.cache.set(key, value)](#Cached.cache.set) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.cache.set(key, value, [overrideTtlSec])](#Cached.cache.set) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.cache.get(key)](#Cached.cache.get) ⇒ <code>Promise.&lt;\*&gt;</code>
     * [.cache.del(key)](#Cached.cache.del) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.cache.invalidate()](#Cached.cache.invalidate) ⇒ <code>Promise.&lt;void&gt;</code>
@@ -126,7 +126,7 @@ Process the returned array from a transaction, throwing errors if any exist
 
 <a name="Cached.cache.set"></a>
 
-### Cached.cache.set(key, value) ⇒ <code>Promise.&lt;void&gt;</code>
+### Cached.cache.set(key, value, [overrideTtlSec]) ⇒ <code>Promise.&lt;void&gt;</code>
 Set value in cache
 
 **Kind**: static method of [<code>Cached</code>](#Cached)  
@@ -135,6 +135,7 @@ Set value in cache
 | --- | --- |
 | key | <code>string</code> | 
 | value | <code>string</code> | 
+| [overrideTtlSec] | <code>number</code> | 
 
 <a name="Cached.cache.get"></a>
 

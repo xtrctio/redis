@@ -44,9 +44,10 @@ class Cached {
      * @memberof Cached
      * @param {string} key
      * @param {string} value
+     * @param {number} [overrideTtlSec]
      * @returns {Promise<void>}
      */
-    cache.set = async (key, value) => {
+    cache.set = async (key, value, overrideTtlSec) => {
       if (!_.isString(key) || key.length === 0) {
         throw new Error('key must be a string with length');
       }
@@ -55,7 +56,13 @@ class Cached {
         throw new Error('value must be a string with length');
       }
 
-      await redis.setex(`${cache.prefix}${key}`, cache.ttlSec, value);
+      if (!_.isInteger(overrideTtlSec) || overrideTtlSec <= 0) {
+        throw new Error('overrideTtlSec must be an integer gte 0');
+      }
+
+      const ttl = _.isInteger(overrideTtlSec) ? overrideTtlSec : cache.ttlSec;
+
+      await redis.setex(`${cache.prefix}${key}`, ttl, value);
     };
 
     /**

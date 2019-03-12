@@ -42,6 +42,14 @@ describe('cached integration tests', () => {
     expect(await cached.cache.get('foo')).to.eql(null);
   });
 
+  it('expires with overridden ttl', async () => {
+    const cached = new Cached(redis, 'something', 10);
+
+    await cached.cache.set('foo', 'bar', 1);
+    await new Promise((res) => setTimeout(res, 1400));
+    expect(await cached.cache.get('foo')).to.eql(null);
+  });
+
   it('deletes', async () => {
     const cached = new Cached(redis, 'something', 10);
 
@@ -68,11 +76,19 @@ describe('cached integration tests', () => {
       constructor() {
         super(redis, 'something', 10);
       }
+
+      async set(key, value) {
+        await this.cache.set(key, value);
+      }
+
+      async get(key) {
+        return this.cache.get(key);
+      }
     }
 
     const foo = new Foo();
 
-    await foo.cache.set('foo', 'bar');
-    expect(await foo.cache.get('foo')).to.eql('bar');
+    await foo.set('foo', 'bar');
+    expect(await foo.get('foo')).to.eql('bar');
   });
 });
