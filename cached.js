@@ -2,6 +2,10 @@
 
 const _ = require('lodash');
 
+// This has to be a sufficiently unique string that other prefixes will not include it
+// Adding this to the end of each prefix allows a wildcard delete for invalidating cache
+const PREFIX_TERMINATOR = '--<<$$PRE_TERM$$>>--';
+
 /**
  * @class
  */
@@ -23,6 +27,12 @@ class Cached {
     if (!_.isInteger(ttlSec) || ttlSec <= 0) {
       throw new Error('ttlSec must be an integer gte 0');
     }
+
+    if (prefix.includes(PREFIX_TERMINATOR)) {
+      throw new Error(`prefix cannot include: ${PREFIX_TERMINATOR}`);
+    }
+
+    prefix += PREFIX_TERMINATOR;
 
     const cache = {
       prefix,

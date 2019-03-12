@@ -50,6 +50,19 @@ describe('cached integration tests', () => {
     expect(await cached.cache.get('foo')).to.eql(null);
   });
 
+  it('invalidates', async () => {
+    const cached = new Cached(redis, 'something', 10);
+    const otherCached = new Cached(redis, 'something-else', 10);
+
+    await cached.cache.set('foo', 'bar1');
+    await otherCached.cache.set('foo', 'bar2');
+
+    await cached.cache.invalidate();
+
+    expect(await cached.cache.get('foo')).to.eql(null);
+    expect(await otherCached.cache.get('foo')).to.eql('bar2');
+  });
+
   it('wraps class nicely', async () => {
     class Foo extends Cached {
       constructor() {
