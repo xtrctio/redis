@@ -28,7 +28,8 @@
     "redis"
   ],
   "files": [
-    "index.js"
+    "index.js",
+    "cached.js"
   ],
   "license": "MIT",
   "main": "index.js",

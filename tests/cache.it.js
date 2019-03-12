@@ -5,7 +5,7 @@ require('dotenv').config();
 const { expect } = require('chai');
 
 const Redis = require('../index');
-const Cached = require('../cached');
+const { Cached } = require('../index');
 
 describe('cached integration tests', () => {
   const redis = new Redis({
