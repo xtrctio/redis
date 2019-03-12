@@ -24,18 +24,19 @@ class Cached {
       throw new Error('ttlSec must be an integer gte 0');
     }
 
-    this.cache = {
+    const cache = {
       prefix,
       ttlSec,
     };
 
     /**
      * Set value in cache
+     * @memberof Cached
      * @param {string} key
      * @param {string} value
      * @returns {Promise<void>}
      */
-    this.cache.set = async (key, value) => {
+    cache.set = async (key, value) => {
       if (!_.isString(key) || key.length === 0) {
         throw new Error('key must be a string with length');
       }
@@ -44,28 +45,30 @@ class Cached {
         throw new Error('value must be a string with length');
       }
 
-      await redis.setex(`${this.cache.prefix}${key}`, this.cache.ttlSec, value);
+      await redis.setex(`${cache.prefix}${key}`, cache.ttlSec, value);
     };
 
     /**
      * Get value from cache by key
+     * @memberof Cached
      * @param {string} key
      * @returns {Promise<void>}
      */
-    this.cache.get = async (key) => {
+    cache.get = async (key) => {
       if (!_.isString(key) || key.length === 0) {
         throw new Error('key must be a string with length');
       }
 
-      return redis.get(`${this.cache.prefix}${key}`);
+      return redis.get(`${cache.prefix}${key}`);
     };
 
     /**
      * Invalidate any entries for this cache
-     * @returns {Promise<*>}
+     * @memberof Cached
+     * @returns {Promise<void>}
      */
-    this.cache.invalidate = async () => new Promise((res, rej) => {
-      const stream = redis.scanStream({ match: `${this.cache.prefix}*`, count: 100 });
+    cache.invalidate = async () => new Promise((res, rej) => {
+      const stream = redis.scanStream({ match: `${cache.prefix}*`, count: 100 });
       stream.on('data', async (resultKeys) => {
         stream.pause();
         await redis.del(...resultKeys);
@@ -75,6 +78,8 @@ class Cached {
       stream.on('end', () => res());
       stream.on('error', (err) => rej(err));
     });
+
+    this.cache = cache;
   }
 }
 

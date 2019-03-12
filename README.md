@@ -6,6 +6,34 @@ Redis wrapper
 
 Wrapper for ioredis: https://github.com/luin/ioredis
 
+Also provides Cached class, so you can do this:
+```javascript
+class Foo extends Cached {
+    constructor() {
+      super(redis, prefix, ttlSec);
+    }
+
+    async setThing(thing, value) {
+      await this.cache.set(thing, value);
+    }
+
+    async getThing() {
+      const result = await this.cache.get('thing');
+
+      if (result) return result;
+    }
+};
+```
+
+## Classes
+
+<dl>
+<dt><a href="#Redis">Redis</a></dt>
+<dd></dd>
+<dt><a href="#Cached">Cached</a></dt>
+<dd></dd>
+</dl>
+
 <a name="Redis"></a>
 
 ## Redis
@@ -74,3 +102,53 @@ Process the returned array from a transaction, throwing errors if any exist
 | --- | --- |
 | results | <code>Array.&lt;object&gt;</code> | 
 
+<a name="Cached"></a>
+
+## Cached
+**Kind**: global class  
+
+* [Cached](#Cached)
+    * [new Cached(redis, prefix, ttlSec)](#new_Cached_new)
+    * [.cache.set(key, value)](#Cached.cache.set) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.cache.get(key)](#Cached.cache.get) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.cache.invalidate()](#Cached.cache.invalidate) ⇒ <code>Promise.&lt;void&gt;</code>
+
+<a name="new_Cached_new"></a>
+
+### new Cached(redis, prefix, ttlSec)
+
+| Param | Type |
+| --- | --- |
+| redis | [<code>Redis</code>](#Redis) | 
+| prefix | <code>string</code> | 
+| ttlSec | <code>number</code> | 
+
+<a name="Cached.cache.set"></a>
+
+### Cached.cache.set(key, value) ⇒ <code>Promise.&lt;void&gt;</code>
+Set value in cache
+
+**Kind**: static method of [<code>Cached</code>](#Cached)  
+
+| Param | Type |
+| --- | --- |
+| key | <code>string</code> | 
+| value | <code>string</code> | 
+
+<a name="Cached.cache.get"></a>
+
+### Cached.cache.get(key) ⇒ <code>Promise.&lt;void&gt;</code>
+Get value from cache by key
+
+**Kind**: static method of [<code>Cached</code>](#Cached)  
+
+| Param | Type |
+| --- | --- |
+| key | <code>string</code> | 
+
+<a name="Cached.cache.invalidate"></a>
+
+### Cached.cache.invalidate() ⇒ <code>Promise.&lt;void&gt;</code>
+Invalidate any entries for this cache
+
+**Kind**: static method of [<code>Cached</code>](#Cached)  

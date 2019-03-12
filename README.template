@@ -6,4 +6,23 @@ Redis wrapper
 
 Wrapper for ioredis: https://github.com/luin/ioredis
 
+Also provides Cached class, so you can do this:
+```javascript
+class Foo extends Cached {
+    constructor() {
+      super(redis, prefix, ttlSec);
+    }
+
+    async setThing(thing, value) {
+      await this.cache.set(thing, value);
+    }
+
+    async getThing() {
+      const result = await this.cache.get('thing');
+
+      if (result) return result;
+    }
+};
+```
+
 {{>main}}

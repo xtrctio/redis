@@ -40,7 +40,7 @@
     "url": "git+https://github.com/xtrctio/redis.git"
   },
   "scripts": {
-    "docs": "jsdoc2md --template README.template --files \"index.js\" > README.md && git add README.md",
+    "docs": "jsdoc2md --template README.template --files \"index.js\" \"cached.js\" > README.md && git add README.md",
     "lint": "eslint \"**/*.js\" --fix",
     "test": "mocha \"tests/**.unit.js\" && npm run lint",
     "test-most": "mocha \"tests/**.unit.js\" \"tests/**.it.js\" && npm run lint"
