@@ -2,6 +2,7 @@
 
 const IORedis = require('ioredis');
 const Redlock = require('redlock');
+const Cached = require('./cached');
 
 /**
  * @class
@@ -88,4 +89,5 @@ class Redis extends IORedis {
   }
 }
 
+Redis.Cached = Cached;
 module.exports = Redis;

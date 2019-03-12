@@ -46,6 +46,7 @@
     "test-most": "mocha \"tests/**.unit.js\" \"tests/**.it.js\" && npm run lint"
   },
   "dependencies": {
+    "lodash": "^4.17.11",
     "redlock": "^3.1.2"
   }
 }
