@@ -110,7 +110,8 @@ Process the returned array from a transaction, throwing errors if any exist
 * [Cached](#Cached)
     * [new Cached(redis, prefix, ttlSec)](#new_Cached_new)
     * [.cache.set(key, value)](#Cached.cache.set) ⇒ <code>Promise.&lt;void&gt;</code>
-    * [.cache.get(key)](#Cached.cache.get) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.cache.get(key)](#Cached.cache.get) ⇒ <code>Promise.&lt;\*&gt;</code>
+    * [.cache.del(key)](#Cached.cache.del) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.cache.invalidate()](#Cached.cache.invalidate) ⇒ <code>Promise.&lt;void&gt;</code>
 
 <a name="new_Cached_new"></a>
@@ -137,8 +138,19 @@ Set value in cache
 
 <a name="Cached.cache.get"></a>
 
-### Cached.cache.get(key) ⇒ <code>Promise.&lt;void&gt;</code>
+### Cached.cache.get(key) ⇒ <code>Promise.&lt;\*&gt;</code>
 Get value from cache by key
+
+**Kind**: static method of [<code>Cached</code>](#Cached)  
+
+| Param | Type |
+| --- | --- |
+| key | <code>string</code> | 
+
+<a name="Cached.cache.del"></a>
+
+### Cached.cache.del(key) ⇒ <code>Promise.&lt;void&gt;</code>
+Delete value from cache by key
 
 **Kind**: static method of [<code>Cached</code>](#Cached)  
 

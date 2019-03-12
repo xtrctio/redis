@@ -42,6 +42,14 @@ describe('cached integration tests', () => {
     expect(await cached.cache.get('foo')).to.eql(null);
   });
 
+  it('deletes', async () => {
+    const cached = new Cached(redis, 'something', 10);
+
+    await cached.cache.set('foo', 'bar');
+    await cached.cache.del('foo');
+    expect(await cached.cache.get('foo')).to.eql(null);
+  });
+
   it('wraps class nicely', async () => {
     class Foo extends Cached {
       constructor() {

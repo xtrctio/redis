@@ -52,7 +52,7 @@ class Cached {
      * Get value from cache by key
      * @memberof Cached
      * @param {string} key
-     * @returns {Promise<void>}
+     * @returns {Promise<*>}
      */
     cache.get = async (key) => {
       if (!_.isString(key) || key.length === 0) {
@@ -60,6 +60,20 @@ class Cached {
       }
 
       return redis.get(`${cache.prefix}${key}`);
+    };
+
+    /**
+     * Delete value from cache by key
+     * @memberof Cached
+     * @param {string} key
+     * @returns {Promise<void>}
+     */
+    cache.del = async (key) => {
+      if (!_.isString(key) || key.length === 0) {
+        throw new Error('key must be a string with length');
+      }
+
+      await redis.del(`${cache.prefix}${key}`);
     };
 
     /**
