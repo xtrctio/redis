@@ -56,7 +56,7 @@ class Cached {
         throw new Error('value must be a string with length');
       }
 
-      if (!_.isInteger(overrideTtlSec) || overrideTtlSec <= 0) {
+      if (overrideTtlSec && (!_.isInteger(overrideTtlSec) || overrideTtlSec <= 0)) {
         throw new Error('overrideTtlSec must be an integer gte 0');
       }
 
