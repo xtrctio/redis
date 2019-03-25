@@ -19,6 +19,8 @@ class Redis extends IORedis {
 
     this.NAME = 'redis';
     this.redlock = this.createRedlock();
+
+    this.__debounced = {};
   }
 
   /**
@@ -102,6 +104,11 @@ class Redis extends IORedis {
   async debounce(callback, key, timeoutMs, skewMs = 5) {
     const self = this;
 
+    if (this.__debounced[key]) {
+      clearTimeout(this.__debounced[key]);
+      delete this.__debounced[key];
+    }
+
     const transaction = self.multi()
       .pttl(key)
       .set(key, 'true', 'NX', 'PX', timeoutMs);
@@ -110,7 +117,7 @@ class Redis extends IORedis {
     const retryMs = result[0] < 0 ? timeoutMs : Math.max(result[0] + skewMs, timeoutMs);
 
     if (!result[1]) {
-      setTimeout(async () => {
+      this.__debounced[key] = setTimeout(async () => {
         if (await self.set(key, 'true', 'NX', 'PX', timeoutMs)) {
           return callback();
         }
