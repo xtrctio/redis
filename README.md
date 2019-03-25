@@ -45,6 +45,7 @@ class Foo extends Cached {
         * [.lock(key, ttl)](#Redis+lock) ⇒ <code>Promise.&lt;(Lock\|null)&gt;</code>
         * [.createRedlock([config])](#Redis+createRedlock) ⇒ <code>Redlock</code>
         * [.scanPromise(...args)](#Redis+scanPromise) ⇒ <code>Promise.&lt;\*&gt;</code>
+        * [.debounce(callback, key, timeoutMs, [skewMs])](#Redis+debounce) ⇒ <code>Promise.&lt;void&gt;</code>
     * _static_
         * [.processMultiResults(results)](#Redis.processMultiResults) ⇒ <code>Array.&lt;object&gt;</code>
 
@@ -90,6 +91,20 @@ Wrapper for scanStream that returns a promise
 | Param | Type |
 | --- | --- |
 | ...args | <code>\*</code> | 
+
+<a name="Redis+debounce"></a>
+
+### redis.debounce(callback, key, timeoutMs, [skewMs]) ⇒ <code>Promise.&lt;void&gt;</code>
+Debounce a callback using Redis and setTimeout locally
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| callback | <code>function</code> |  | 
+| key | <code>string</code> |  | 
+| timeoutMs | <code>number</code> |  | 
+| [skewMs] | <code>number</code> | <code>5</code> | 
 
 <a name="Redis.processMultiResults"></a>
 

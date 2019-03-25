@@ -2,7 +2,10 @@
 
 const IORedis = require('ioredis');
 const Redlock = require('redlock');
+const Promise = require('bluebird');
 const Cached = require('./cached');
+
+IORedis.Promise = Promise;
 
 /**
  * @class
@@ -86,6 +89,37 @@ class Redis extends IORedis {
 
       return result[RESULT_INDEX];
     });
+  }
+
+  /**
+   * Debounce a callback using Redis and setTimeout locally
+   * @param {Function} callback
+   * @param {string} key
+   * @param {number} timeoutMs
+   * @param {number} [skewMs=5]
+   * @returns {Promise<void>}
+   */
+  async debounce(callback, key, timeoutMs, skewMs = 5) {
+    const self = this;
+
+    const transaction = self.multi()
+      .pttl(key)
+      .set(key, 'true', 'NX', 'PX', timeoutMs);
+
+    const result = Redis.processMultiResults(await transaction.exec());
+    const retryMs = result[0] < 0 ? timeoutMs : Math.max(result[0] + skewMs, timeoutMs);
+
+    if (!result[1]) {
+      setTimeout(async () => {
+        if (await self.set(key, 'true', 'NX', 'PX', timeoutMs)) {
+          return callback();
+        }
+        return null;
+      }, retryMs);
+      return null;
+    }
+
+    return callback();
   }
 }
 
