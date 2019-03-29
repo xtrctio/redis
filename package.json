@@ -1,7 +1,7 @@
 {
   "name": "@xtrctio/redis",
   "description": "Redis wrapper",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": "Eric Hacke",
   "bugs": {
     "url": "https://github.com/xtrctio/redis/issues"
