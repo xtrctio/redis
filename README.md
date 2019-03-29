@@ -40,7 +40,6 @@ class Foo extends Cached {
 **Kind**: global class  
 
 * [Redis](#Redis)
-    * [new Redis(config)](#new_Redis_new)
     * _instance_
         * [.lock(key, ttl)](#Redis+lock) ⇒ <code>Promise.&lt;(Lock\|null)&gt;</code>
         * [.createRedlock([config])](#Redis+createRedlock) ⇒ <code>Redlock</code>
@@ -48,14 +47,6 @@ class Foo extends Cached {
         * [.debounce(callback, key, timeoutMs, [skewMs])](#Redis+debounce) ⇒ <code>Promise.&lt;void&gt;</code>
     * _static_
         * [.processMultiResults(results)](#Redis.processMultiResults) ⇒ <code>Array.&lt;object&gt;</code>
-
-<a name="new_Redis_new"></a>
-
-### new Redis(config)
-
-| Param | Type | Description |
-| --- | --- | --- |
-| config | <code>object</code> | ioredis config |
 
 <a name="Redis+lock"></a>
 

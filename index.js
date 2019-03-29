@@ -11,11 +11,9 @@ IORedis.Promise = Promise;
  * @class
  */
 class Redis extends IORedis {
-  /**
-   * @param {object} config ioredis config
-   */
-  constructor(config) {
-    super(config);
+  // eslint-disable-next-line
+  constructor(...args) {
+    super(...args);
 
     this.NAME = 'redis';
     this.redlock = this.createRedlock();
