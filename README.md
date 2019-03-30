@@ -114,7 +114,7 @@ Process the returned array from a transaction, throwing errors if any exist
 **Kind**: global class  
 
 * [Cached](#Cached)
-    * [new Cached(redis, prefix, ttlSec)](#new_Cached_new)
+    * [new Cached(redis, prefix, ttlSec, [resetOnReconnection])](#new_Cached_new)
     * [.cache.set(key, value, [overrideTtlSec])](#Cached.cache.set) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.cache.get(key)](#Cached.cache.get) ⇒ <code>Promise.&lt;\*&gt;</code>
     * [.cache.del(key)](#Cached.cache.del) ⇒ <code>Promise.&lt;void&gt;</code>
@@ -122,13 +122,14 @@ Process the returned array from a transaction, throwing errors if any exist
 
 <a name="new_Cached_new"></a>
 
-### new Cached(redis, prefix, ttlSec)
+### new Cached(redis, prefix, ttlSec, [resetOnReconnection])
 
-| Param | Type |
-| --- | --- |
-| redis | [<code>Redis</code>](#Redis) | 
-| prefix | <code>string</code> | 
-| ttlSec | <code>number</code> | 
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| redis | [<code>Redis</code>](#Redis) |  |  |
+| prefix | <code>string</code> |  |  |
+| ttlSec | <code>number</code> |  |  |
+| [resetOnReconnection] | <code>boolean</code> | <code>true</code> | clear the cache when a new connection is made |
 
 <a name="Cached.cache.set"></a>
 

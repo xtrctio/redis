@@ -3,17 +3,22 @@
 /* eslint-disable no-process-env, no-unused-expressions, require-jsdoc */
 require('dotenv').config();
 const { expect } = require('chai');
+const Promise = require('bluebird');
 
 const Redis = require('../index');
 const { Cached } = require('../index');
 
 describe('cached integration tests', () => {
-  const redis = new Redis({
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-  });
+  let redis;
 
-  beforeEach(() => redis.flushdb());
+  beforeEach(async () => {
+    redis = new Redis({
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+    });
+
+    await redis.flushdb();
+  });
 
   after(async () => {
     redis && await redis.disconnect();
@@ -90,5 +95,31 @@ describe('cached integration tests', () => {
 
     await foo.set('foo', 'bar');
     expect(await foo.get('foo')).to.eql('bar');
+  });
+
+  it('with bad connection, get returns null', async () => {
+    const cached = new Cached(new Redis('not-here:6379', { enableOfflineQueue: false }), 'something', 1);
+
+    await cached.cache.set('foo', 'bar');
+    expect(await cached.cache.get('foo')).to.eql(null);
+  });
+
+  it('with bad connection, invalidate on reconnection', async () => {
+    const cached = new Cached(redis, 'something', 1);
+
+    await cached.cache.set('foo', 'bar');
+    expect(await cached.cache.get('foo')).to.eql('bar');
+
+    const oldSetex = redis.setex;
+    redis.setex = () => Promise.reject(new Error('stream isn\'t writeable'));
+
+    await cached.cache.set('foo', 'bar');
+    expect(await cached.cache.get('foo')).to.eql(null);
+    expect(await cached.cache.get('foo')).to.eql(null);
+
+    redis.setex = oldSetex;
+
+    await cached.cache.set('foo', 'bar');
+    expect(await cached.cache.get('foo')).to.eql('bar');
   });
 });

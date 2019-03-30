@@ -14,8 +14,9 @@ class Cached {
    * @param {Redis} redis
    * @param {string} prefix
    * @param {number} ttlSec
+   * @param {boolean} [resetOnReconnection=true] clear the cache when a new connection is made
    */
-  constructor(redis, prefix, ttlSec) {
+  constructor(redis, prefix, ttlSec, resetOnReconnection = true) {
     if (!_.isObject(redis)) {
       throw new Error('redis must be an object');
     }
@@ -37,6 +38,29 @@ class Cached {
     const cache = {
       prefix,
       ttlSec,
+    };
+
+    let invalidateOnConnection = false;
+
+    const suppressConnectionError = (err) => {
+      if (err && err.message && err.message.toLowerCase().includes('stream isn\'t writeable')) {
+        invalidateOnConnection = true;
+        return null;
+      }
+
+      throw err;
+    };
+
+    const invalidateOnReconnection = async (result) => {
+      if (resetOnReconnection && invalidateOnConnection) {
+        // eslint-disable-next-line
+        console.log(`Resetting cache on: ${prefix}`);
+        invalidateOnConnection = false;
+        await cache.invalidate();
+        return null;
+      }
+
+      return result;
     };
 
     /**
@@ -62,7 +86,9 @@ class Cached {
 
       const ttl = _.isInteger(overrideTtlSec) ? overrideTtlSec : cache.ttlSec;
 
-      await redis.setex(`${cache.prefix}${key}`, ttl, value);
+      await redis.setex(`${cache.prefix}${key}`, ttl, value)
+        .then(invalidateOnReconnection)
+        .catch(suppressConnectionError);
     };
 
     /**
@@ -76,7 +102,9 @@ class Cached {
         throw new Error('key must be a string with length');
       }
 
-      return redis.get(`${cache.prefix}${key}`);
+      return redis.get(`${cache.prefix}${key}`)
+        .then(invalidateOnReconnection)
+        .catch(suppressConnectionError);
     };
 
     /**
@@ -90,7 +118,9 @@ class Cached {
         throw new Error('key must be a string with length');
       }
 
-      await redis.del(`${cache.prefix}${key}`);
+      await redis.del(`${cache.prefix}${key}`)
+        .then(invalidateOnReconnection)
+        .catch(suppressConnectionError);
     };
 
     /**
