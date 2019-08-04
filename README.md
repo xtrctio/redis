@@ -163,7 +163,7 @@ Add document to index
 | index | <code>string</code> |  | 
 | id | <code>string</code> |  | 
 | document | <code>object</code> |  | 
-| [options] | <code>object</code> | <code>{ replace: true, noSave: true }</code> | 
+| [options] | <code>object</code> | <code>{ replace: true, noSave: false }</code> | 
 
 <a name="Redis+search"></a>
 
@@ -176,7 +176,7 @@ Search index using query
 | --- | --- | --- |
 | index | <code>string</code> |  | 
 | query | <code>string</code> |  | 
-| [options] | <code>object</code> | <code>{ idOnly: true, sortBy: null, sortDirection: &#x27;ASC&#x27;, limit: 100, page: 0 }</code> | 
+| [options] | <code>object</code> | <code>{ idOnly: false, sortBy: null, sortDirection: &#x27;ASC&#x27;, limit: 100, page: 0 }</code> | 
 
 <a name="Redis+removeFromIndex"></a>
 

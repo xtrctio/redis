@@ -34,4 +34,9 @@ describe('search unit tests', () => {
 
     expect(schemaArray).to.eql(['SCHEMA', 'field1', 'TEXT', 'SORTABLE', 'field2', 'GEO', 'NOSTEM']);
   });
+
+  it('pairs to object', () => {
+    const pairs = ['foo', '123', 'bar', '3453'];
+    expect(Redis._pairsToObject(pairs)).to.eql({ foo: '123', bar: '3453' });
+  });
 });

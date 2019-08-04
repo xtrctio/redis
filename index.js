@@ -251,21 +251,20 @@ class Redis extends IORedis {
    * @param {string} index
    * @param {string} id
    * @param {object} document
-   * @param {object} [options= { replace: true, noSave: true }]
+   * @param {object} [options= { replace: true, noSave: false }]
    * @return {Promise<*>}
    */
   async addToIndex(
     index,
     id,
     document,
-    options = { replace: true, noSave: true },
+    options = {},
   ) {
     if (!index) throw new Error('index name must be provided');
     if (!id) throw new Error('id must be provided');
     if (!document || typeof document !== 'object') throw new Error('document must be an object');
 
-    options = _.defaultsDeep({}, options, { replace: true, noSave: true });
-
+    options = _.defaultsDeep({}, options, { replace: true, noSave: false });
     let args = [index, id, 1];
 
     if (options.noSave) {
@@ -291,10 +290,27 @@ class Redis extends IORedis {
   }
 
   /**
+   * Convert pairs in array into object
+   * @param {*[]} array
+   * @returns {object}
+   * @private
+   */
+  static _pairsToObject(array) {
+    if (!Array.isArray(array)) throw new Error(`must be array: ${array}`);
+
+    const result = {};
+    for (let i = 0; i < array.length; i += 2) {
+      result[array[i]] = array[i + 1];
+    }
+
+    return result;
+  }
+
+  /**
    * Search index using query
    * @param {string} index
    * @param {string} query
-   * @param {object} [options={ idOnly: true, sortBy: null, sortDirection: 'ASC', limit: 100, page: 0 }]
+   * @param {object} [options={ idOnly: false, sortBy: null, sortDirection: 'ASC', limit: 100, page: 0 }]
    * @return {Promise<{total: *, ids: *, page: *}>}
    */
   async search(index, query, options = {}) {
@@ -302,7 +318,7 @@ class Redis extends IORedis {
     if (!query) throw new Error('query must be provided');
 
     options = _.defaultsDeep({}, options, {
-      idOnly: true, sortBy: null, sortDirection: 'ASC', limit: 100, page: 0,
+      idOnly: false, sortBy: null, sortDirection: 'ASC', limit: 100, page: 0,
     });
 
     let args = [index, query];
@@ -311,12 +327,26 @@ class Redis extends IORedis {
     if (options.sortBy) args = args.concat(['SORTBY', options.sortBy, options.sortDirection]);
     if (options.limit) args = args.concat(['LIMIT', options.page, options.limit]);
 
-    const result = await this.call('FT.SEARCH', ...args);
+    const results = await this.call('FT.SEARCH', ...args);
+    let processedResults;
+
+    if (options.idOnly) {
+      processedResults = results.slice(1, results.length);
+    } else {
+      const documentsById = Redis._pairsToObject(results.slice(1, results.length));
+      processedResults = _.reduce(documentsById, (_results, documentArray, id) => {
+        _results.push({
+          id,
+          ...Redis._pairsToObject(documentArray),
+        });
+        return _results;
+      }, []);
+    }
 
     return {
-      total: result[0],
+      total: results[0],
       page: options.page,
-      ids: result.slice(1, result.length),
+      results: processedResults,
     };
   }
 
