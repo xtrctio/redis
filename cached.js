@@ -43,7 +43,11 @@ class Cached {
     let invalidateOnConnection = false;
 
     const suppressConnectionError = (err) => {
-      if (err && err.message && err.message.toLowerCase().includes('stream isn\'t writeable')) {
+      if (
+        err
+        && err.message
+        && err.message.toLowerCase().includes('stream isn\'t writeable')
+      ) {
         invalidateOnConnection = true;
         return null;
       }
@@ -80,13 +84,17 @@ class Cached {
         throw new Error('value must be a string with length');
       }
 
-      if (overrideTtlSec && (!_.isInteger(overrideTtlSec) || overrideTtlSec <= 0)) {
+      if (
+        overrideTtlSec
+        && (!_.isInteger(overrideTtlSec) || overrideTtlSec <= 0)
+      ) {
         throw new Error('overrideTtlSec must be an integer gte 0');
       }
 
       const ttl = _.isInteger(overrideTtlSec) ? overrideTtlSec : cache.ttlSec;
 
-      await redis.setex(`${cache.prefix}${key}`, ttl, value)
+      await redis
+        .setex(`${cache.prefix}${key}`, ttl, value)
         .then(invalidateOnReconnection)
         .catch(suppressConnectionError);
     };
@@ -102,7 +110,8 @@ class Cached {
         throw new Error('key must be a string with length');
       }
 
-      return redis.get(`${cache.prefix}${key}`)
+      return redis
+        .get(`${cache.prefix}${key}`)
         .then(invalidateOnReconnection)
         .catch(suppressConnectionError);
     };
@@ -118,7 +127,8 @@ class Cached {
         throw new Error('key must be a string with length');
       }
 
-      await redis.del(`${cache.prefix}${key}`)
+      await redis
+        .del(`${cache.prefix}${key}`)
         .then(invalidateOnReconnection)
         .catch(suppressConnectionError);
     };
@@ -129,7 +139,10 @@ class Cached {
      * @returns {Promise<void>}
      */
     cache.invalidate = async () => new Promise((res, rej) => {
-      const stream = redis.scanStream({ match: `${cache.prefix}*`, count: 100 });
+      const stream = redis.scanStream({
+        match: `${cache.prefix}*`,
+        count: 100,
+      });
       stream.on('data', async (resultKeys) => {
         stream.pause();
         await redis.del(...resultKeys);

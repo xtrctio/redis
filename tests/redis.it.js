@@ -13,7 +13,7 @@ describe('integration tests', () => {
   let redis = null;
 
   afterEach(async () => {
-    redis && await redis.disconnect();
+    redis && (await redis.disconnect());
   });
 
   it('gets lock', async () => {
@@ -42,7 +42,7 @@ describe('debounce tests', () => {
 
   afterEach(async () => {
     await redis.flushdb();
-    redis && await redis.disconnect();
+    redis && (await redis.disconnect());
   });
 
   it('debounces many calls using redis', async () => {
@@ -59,15 +59,19 @@ describe('debounce tests', () => {
 
     const times = Array.from(Array(totalCalls).keys());
     const timeoutMs = 500;
-    await Promise.map(times, async () => {
-      calls++;
-      await redis.debounce(updateCounter, 'foo', timeoutMs);
-      await Promise.delay(50);
-    }, { concurrency: 10 });
+    await Promise.map(
+      times,
+      async () => {
+        calls++;
+        await redis.debounce(updateCounter, 'foo', timeoutMs);
+        await Promise.delay(50);
+      },
+      { concurrency: 10 },
+    );
 
     await Promise.delay(timeoutMs * 2);
 
     expect(calls).to.eql(totalCalls);
-    expect(counter).to.eql(2);
+    expect(counter).to.eql(3);
   });
 });
