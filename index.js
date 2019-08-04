@@ -279,6 +279,7 @@ class Redis extends IORedis {
     args.push('FIELDS');
 
     args = Object.keys(document).reduce((_args, key) => {
+      if (!document[key]) return _args;
       if (typeof document[key] === 'object') throw new Error('document properties cannot be objects');
 
       _args.push(key);
