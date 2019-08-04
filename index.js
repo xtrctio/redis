@@ -3,9 +3,21 @@
 const IORedis = require('ioredis');
 const Redlock = require('redlock');
 const Promise = require('bluebird');
+const _ = require('lodash');
 const Cached = require('./cached');
 
 IORedis.Promise = Promise;
+
+const CONSTANTS = {
+  SEARCH_FIELD_TYPES: {
+    TAG: 'tag',
+    TEXT: 'text',
+    NUMERIC: 'numeric',
+    GEO: 'geo',
+  },
+};
+
+CONSTANTS.SEARCH_FIELD_TYPE_VALUES = Object.values(CONSTANTS.SEARCH_FIELD_TYPES);
 
 /**
  * @class
@@ -29,7 +41,11 @@ class Redis extends IORedis {
    */
   async lock(key, ttl) {
     return this.redlock.lock(key, ttl).catch((err) => {
-      if (err && err.message && err.message.includes('attempts to lock the resource')) {
+      if (
+        err
+        && err.message
+        && err.message.includes('attempts to lock the resource')
+      ) {
         return null;
       }
 
@@ -107,7 +123,8 @@ class Redis extends IORedis {
       delete this.__debounced[key];
     }
 
-    const transaction = self.multi()
+    const transaction = self
+      .multi()
       .pttl(key)
       .set(key, 'true', 'NX', 'PX', timeoutMs);
 
@@ -125,6 +142,204 @@ class Redis extends IORedis {
     }
 
     return callback();
+  }
+
+  /**
+   * Get size of search index
+   * @param {string} index
+   * @return {Promise<null|*>}
+   */
+  async indexSize(index) {
+    if (!index) throw new Error('index name must be provided');
+
+    try {
+      const result = await this.call('FT.INFO', index);
+      if (Array.isArray(result) && result.length > 0) return result[5];
+    } catch (err) {
+      if (err.message === 'Unknown Index name') return null;
+      throw err;
+    }
+
+    return null;
+  }
+
+  /**
+   * Check if search index exists
+   * @param {string} index
+   * @return {Promise<boolean>}
+   */
+  async indexExists(index) {
+    return !!(await this.indexSize(index));
+  }
+
+  /**
+   * @param {object} schema
+   * @return {Array}
+   * @private
+   */
+  static _processSchema(schema) {
+    if (!_.isPlainObject(schema)) throw new Error('schema must be an object');
+
+    return Object.keys(schema).reduce((result, key) => {
+      const fieldOptions = schema[key];
+
+      result.push(key);
+
+      if (!fieldOptions.type || !CONSTANTS.SEARCH_FIELD_TYPE_VALUES.includes(fieldOptions.type)) {
+        throw new Error(`type must be one of: ${CONSTANTS.SEARCH_FIELD_TYPE_VALUES.join(', ')}`);
+      }
+
+      result.push(fieldOptions.type.toUpperCase());
+
+      if (fieldOptions.sortable) result.push('SORTABLE');
+      if (fieldOptions.noStem) result.push('NOSTEM');
+
+      return result;
+    }, ['SCHEMA']);
+  }
+
+  /**
+   * Create a search index
+   * @param {string} index
+   * @param {object} schema
+   * @param {object} [options={
+    ttl: false,
+    highlighting: true,
+    noStopwords: false,
+  }]
+   * @return {Promise<void>}
+   */
+  async createIndex(
+    index,
+    schema,
+    options = {},
+  ) {
+    if (!index) throw new Error('index name must be provided');
+    if (!schema) throw new Error('schema must be provided');
+
+    options = _.defaultsDeep({}, options, {
+      ttl: false,
+      highlighting: true,
+      noStopwords: false,
+    });
+
+    let args = [index];
+
+    if (options.ttl) {
+      args.push('TEMPORARY');
+      args.push(options.ttl);
+    }
+
+    if (options.highlighting === false) {
+      args.push('NOHL');
+    }
+
+    if (options.noStopwords === true) {
+      args.push('STORWORDS');
+      args.push('0');
+    }
+
+    if (schema) {
+      args = args.concat(Redis._processSchema(schema));
+    }
+
+    await this.call('FT.CREATE', ...args);
+  }
+
+  /**
+   * Add document to index
+   * @param {string} index
+   * @param {string} id
+   * @param {object} document
+   * @param {object} [options= { replace: true, noSave: true }]
+   * @return {Promise<*>}
+   */
+  async addToIndex(
+    index,
+    id,
+    document,
+    options = { replace: true, noSave: true },
+  ) {
+    if (!index) throw new Error('index name must be provided');
+    if (!id) throw new Error('id must be provided');
+    if (!document || typeof document !== 'object') throw new Error('document must be an object');
+
+    options = _.defaultsDeep({}, options, { replace: true, noSave: true });
+
+    let args = [index, id, 1];
+
+    if (options.noSave) {
+      args.push('NOSAVE');
+    }
+
+    if (options.replace) {
+      args.push('REPLACE');
+    }
+
+    args.push('FIELDS');
+
+    args = Object.keys(document).reduce((_args, key) => {
+      if (typeof document[key] === 'object') throw new Error('document properties cannot be objects');
+
+      _args.push(key);
+      _args.push(document[key]);
+      return _args;
+    }, args);
+
+    return this.call('FT.ADD', ...args);
+  }
+
+  /**
+   * Search index using query
+   * @param {string} index
+   * @param {string} query
+   * @param {object} [options={ idOnly: true, sortBy: null, sortDirection: 'ASC', limit: 100, page: 0 }]
+   * @return {Promise<{total: *, ids: *, page: *}>}
+   */
+  async search(index, query, options = {}) {
+    if (!index) throw new Error('index name must be provided');
+    if (!query) throw new Error('query must be provided');
+
+    options = _.defaultsDeep({}, options, {
+      idOnly: true, sortBy: null, sortDirection: 'ASC', limit: 100, page: 0,
+    });
+
+    let args = [index, query];
+
+    if (options.idOnly) args.push('NOCONTENT');
+    if (options.sortBy) args = args.concat(['SORTBY', options.sortBy, options.sortDirection]);
+    if (options.limit) args = args.concat(['LIMIT', options.page, options.limit]);
+
+    const result = await this.call('FT.SEARCH', ...args);
+
+    return {
+      total: result[0],
+      page: options.page,
+      ids: result.slice(1, result.length),
+    };
+  }
+
+  /**
+   * Remove document from index
+   * @param {string} index
+   * @param {string} id
+   * @return {Promise<*>}
+   */
+  async removeFromIndex(index, id) {
+    if (!index) throw new Error('index name must be provided');
+    if (!id) throw new Error('id must be provided');
+
+    return this.call('FT.DEL', index, id, 'DD');
+  }
+
+  /**
+   * Delete index
+   * @param {string} index
+   * @return {Promise<void>}
+   */
+  async deleteIndex(index) {
+    if (!index) throw new Error('index name must be provided');
+    await this.call('FT.DROP', index);
   }
 }
 

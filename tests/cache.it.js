@@ -21,7 +21,7 @@ describe('cached integration tests', () => {
   });
 
   after(async () => {
-    redis && await redis.disconnect();
+    redis && (await redis.disconnect());
   });
 
   it('set and get values in cache', async () => {
@@ -98,7 +98,11 @@ describe('cached integration tests', () => {
   });
 
   it('with bad connection, get returns null', async () => {
-    const cached = new Cached(new Redis('not-here:6379', { enableOfflineQueue: false }), 'something', 1);
+    const cached = new Cached(
+      new Redis('not-here:6379', { enableOfflineQueue: false }),
+      'something',
+      1,
+    );
 
     await cached.cache.set('foo', 'bar');
     expect(await cached.cache.get('foo')).to.eql(null);

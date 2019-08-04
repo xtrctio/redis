@@ -45,6 +45,17 @@ class Foo extends Cached {
         * [.createRedlock([config])](#Redis+createRedlock) ⇒ <code>Redlock</code>
         * [.scanPromise(...args)](#Redis+scanPromise) ⇒ <code>Promise.&lt;\*&gt;</code>
         * [.debounce(callback, key, timeoutMs, [skewMs])](#Redis+debounce) ⇒ <code>Promise.&lt;void&gt;</code>
+        * [.indexSize(index)](#Redis+indexSize) ⇒ <code>Promise.&lt;(null\|\*)&gt;</code>
+        * [.indexExists(index)](#Redis+indexExists) ⇒ <code>Promise.&lt;boolean&gt;</code>
+        * [.createIndex(index, schema, [options&#x3D;{
+    ttl: false,
+    highlighting: true,
+    noStopwords: false,
+  }])](#Redis+createIndex) ⇒ <code>Promise.&lt;void&gt;</code>
+        * [.addToIndex(index, id, document, [options])](#Redis+addToIndex) ⇒ <code>Promise.&lt;\*&gt;</code>
+        * [.search(index, query, [options])](#Redis+search) ⇒ <code>Promise.&lt;{total: \*, ids: \*, page: \*}&gt;</code>
+        * [.removeFromIndex(index, id)](#Redis+removeFromIndex) ⇒ <code>Promise.&lt;\*&gt;</code>
+        * [.deleteIndex(index)](#Redis+deleteIndex) ⇒ <code>Promise.&lt;void&gt;</code>
     * _static_
         * [.processMultiResults(results)](#Redis.processMultiResults) ⇒ <code>Array.&lt;object&gt;</code>
 
@@ -96,6 +107,99 @@ Debounce a callback using Redis and setTimeout locally
 | key | <code>string</code> |  | 
 | timeoutMs | <code>number</code> |  | 
 | [skewMs] | <code>number</code> | <code>5</code> | 
+
+<a name="Redis+indexSize"></a>
+
+### redis.indexSize(index) ⇒ <code>Promise.&lt;(null\|\*)&gt;</code>
+Get size of search index
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type |
+| --- | --- |
+| index | <code>string</code> | 
+
+<a name="Redis+indexExists"></a>
+
+### redis.indexExists(index) ⇒ <code>Promise.&lt;boolean&gt;</code>
+Check if search index exists
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type |
+| --- | --- |
+| index | <code>string</code> | 
+
+<a name="Redis+createIndex"></a>
+
+### redis.createIndex(index, schema, [options&#x3D;{
+    ttl: false,
+    highlighting: true,
+    noStopwords: false,
+  }]) ⇒ <code>Promise.&lt;void&gt;</code>
+Create a search index
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type |
+| --- | --- |
+| index | <code>string</code> | 
+| schema | <code>object</code> | 
+| [options={
+    ttl: false,
+    highlighting: true,
+    noStopwords: false,
+  }] | <code>object</code> | 
+
+<a name="Redis+addToIndex"></a>
+
+### redis.addToIndex(index, id, document, [options]) ⇒ <code>Promise.&lt;\*&gt;</code>
+Add document to index
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| index | <code>string</code> |  | 
+| id | <code>string</code> |  | 
+| document | <code>object</code> |  | 
+| [options] | <code>object</code> | <code>{ replace: true, noSave: true }</code> | 
+
+<a name="Redis+search"></a>
+
+### redis.search(index, query, [options]) ⇒ <code>Promise.&lt;{total: \*, ids: \*, page: \*}&gt;</code>
+Search index using query
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| index | <code>string</code> |  | 
+| query | <code>string</code> |  | 
+| [options] | <code>object</code> | <code>{ idOnly: true, sortBy: null, sortDirection: &#x27;ASC&#x27;, limit: 100, page: 0 }</code> | 
+
+<a name="Redis+removeFromIndex"></a>
+
+### redis.removeFromIndex(index, id) ⇒ <code>Promise.&lt;\*&gt;</code>
+Remove document from index
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type |
+| --- | --- |
+| index | <code>string</code> | 
+| id | <code>string</code> | 
+
+<a name="Redis+deleteIndex"></a>
+
+### redis.deleteIndex(index) ⇒ <code>Promise.&lt;void&gt;</code>
+Delete index
+
+**Kind**: instance method of [<code>Redis</code>](#Redis)  
+
+| Param | Type |
+| --- | --- |
+| index | <code>string</code> | 
 
 <a name="Redis.processMultiResults"></a>
 
