@@ -291,7 +291,7 @@ class Redis extends IORedis {
 
   /**
    * Convert pairs in array into object
-   * @param {*[]} array
+   * @param {any[]} array
    * @returns {object}
    * @private
    */
