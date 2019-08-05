@@ -140,6 +140,7 @@ Check if search index exists
 Create a search index
 
 **Kind**: instance method of [<code>Redis</code>](#Redis)  
+**Link**: https://oss.redislabs.com/redisearch/Commands.html  
 
 | Param | Type |
 | --- | --- |

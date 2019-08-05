@@ -191,8 +191,8 @@ class Redis extends IORedis {
 
       result.push(fieldOptions.type.toUpperCase());
 
-      if (fieldOptions.sortable) result.push('SORTABLE');
       if (fieldOptions.noStem) result.push('NOSTEM');
+      if (fieldOptions.sortable) result.push('SORTABLE');
 
       return result;
     }, ['SCHEMA']);
@@ -200,6 +200,7 @@ class Redis extends IORedis {
 
   /**
    * Create a search index
+   * @link https://oss.redislabs.com/redisearch/Commands.html
    * @param {string} index
    * @param {object} schema
    * @param {object} [options={
